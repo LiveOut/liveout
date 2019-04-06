@@ -1,16 +1,23 @@
 "use strict";
-const express = require("express");
 const mongoose = require("mongoose");
+const express = require("express");
+const MongoClient = require("mongodb").MongoClient;
+const bodyParser = require("body-parser");
 
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
 const posts = require("./routes/api/posts");
 
 const app = express();
-const db = require("./config/keys").mongoURI;
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+const uri = require("./config/keys").mongoURI;
+const client = new MongoClient(uri, { useNewUrlParser: true });
 
 mongoose
-  .connect(db)
+  .connect(uri, { useNewUrlParser: true })
   .then(() => {
     console.log("MongoDB connected");
   })
