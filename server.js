@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 const bodyParser = require("body-parser");
+const passport = require("passport");
 
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
@@ -23,8 +24,8 @@ mongoose
   })
   .catch(err => console.error(err));
 
-app.get("/", (req, res) => res.send("Hello World"));
-
+app.use(passport.initialize());
+require("./config/passport")(passport);
 //init routes
 app.use("/api/users", users);
 app.use("/api/profile", profile);

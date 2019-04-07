@@ -1,3 +1,4 @@
 module.exports = {
-  mongoURI: `mongodb+srv://Willy:testwillyTestWilly@liveout-wspub.mongodb.net/test?retryWrites=true`
+  mongoURI: `mongodb+srv://Willy:testwillyTestWilly@liveout-wspub.mongodb.net/test?retryWrites=true`,
+  secretOrkey: "secret42"
 };
