@@ -7,6 +7,8 @@ const passport = require("passport");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const validateProfileInput = require("../../validation/profile");
+const validateResidenceInput = require("../../validation/residence");
+const validateEducationInput = require("../../validation/education");
 
 router.get("/test", (req, res) =>
   res.json({
@@ -38,6 +40,59 @@ router.get(
       });
   }
 );
+
+router.get("/handle/:handle", (req, res) => {
+  let errors = {};
+
+  Profile.findOne({ handle: req.params.handle })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        res.status(404).json(errors);
+      }
+      res.json(profile);
+    })
+    .catch(err => {
+      res.status(404).json(errors);
+    });
+});
+
+router.get("/user/:user_id", (req, res) => {
+  let errors = {};
+
+  Profile.findOne({ user: req.params.user_id })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        res.status(404).json(errors);
+      }
+
+      res.json(profile);
+    })
+    .catch(err => {
+      res.status(404).json({ profile: "There is no profile for this user" });
+    });
+});
+
+router.get("/all", (req, res) => {
+  const errors = {};
+
+  Profile.find()
+    .populate("user", ["name", "avatar"])
+    .then(profiles => {
+      if (!profiles) {
+        errors.noprofile = "There are no profiles";
+        return res.status(404).json(errors);
+      }
+
+      res.json(profiles);
+    })
+    .catch(err => {
+      res.status(404).json({ profile: "There are no profiles to fetch" });
+    });
+});
 
 /**
  * POST create or edit profile
@@ -89,6 +144,72 @@ router.post(
               res.status(404).json(err);
             });
         }
+      })
+      .catch(err => {
+        res.status(404).json(err);
+      });
+  }
+);
+
+/**
+ * @route POST add Residence
+ */
+
+router.post(
+  "/residence",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateResidenceInput(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
+    //console.log(req.user.id);
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const newRes = {
+          type: req.body.type,
+          address: req.body.address,
+          from: req.body.from,
+          to: req.body.to,
+          description: req.body.descrtiption
+        };
+
+        profile.residences.unshift(newRes);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => {
+        res.status(404).json(err);
+      });
+  }
+);
+
+/**
+ * @route POST add Education
+ */
+
+router.post(
+  "/education",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateEducationInput(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
+    //console.log(req.user.id);
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        const newEdu = {
+          institution: req.body.institution,
+          from: new Date(req.body.from),
+          to: new Date(req.body.to)
+        };
+
+        profile.education.unshift(newEdu);
+        profile.save().then(profile => res.json(profile));
       })
       .catch(err => {
         res.status(404).json(err);

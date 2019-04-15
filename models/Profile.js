@@ -47,7 +47,7 @@ const profileSchemaTemplate = {
 
   education: [
     {
-      school: {
+      institution: {
         type: String,
         required: true
       },
