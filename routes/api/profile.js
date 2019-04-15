@@ -156,7 +156,7 @@ router.post(
  */
 
 router.post(
-  "/residence",
+  "/residences",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const { errors, isValid } = validateResidenceInput(req.body);
@@ -214,6 +214,88 @@ router.post(
       .catch(err => {
         res.status(404).json(err);
       });
+  }
+);
+
+/**
+ * @route DELETE residence from profile
+ */
+
+router.delete(
+  "/residences/:res_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //console.log(req.user.id);
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        // Get remove idx
+        const remove_idx = profile.residences
+          .map(item => item.id)
+          .indexOf(req.params.res_id);
+
+        profile.residences.splice(remove_idx, 1);
+
+        profile
+          .save()
+          .then(profile => {
+            res.json(profile);
+          })
+          .catch(err => {
+            res.status(404).json(err);
+          });
+      })
+      .catch(err => {
+        res.status(404).json(err);
+      });
+  }
+);
+
+/**
+ * @route DELETE education from profile
+ */
+
+router.delete(
+  "/education/:edu_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //console.log(req.user.id);
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        // Get remove idx
+        const remove_idx = profile.education
+          .map(item => item.id)
+          .indexOf(req.params.edu_id);
+
+        profile.education.splice(remove_idx, 1);
+
+        profile
+          .save()
+          .then(profile => {
+            res.json(profile);
+          })
+          .catch(err => {
+            res.status(404).json(err);
+          });
+      })
+      .catch(err => {
+        res.status(404).json(err);
+      });
+  }
+);
+
+/**
+ * @route DELETE user and profile
+ */
+
+router.delete(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOneAndRemove({ user: req.user.id }).then(() => {
+      User.findOneAndRemove({ _id: req.user.id }).then(() => {
+        res.json({ success: true });
+      });
+    });
   }
 );
 
