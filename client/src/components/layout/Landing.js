@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 class Landing extends Component {
   render() {
@@ -12,15 +13,15 @@ class Landing extends Component {
                 <p className="lead">
                   {" "}
                   Create a member profile and share your off-campus housing
-                  experiences with other members of the community.
+                  experiences with members of the RPI community.
                 </p>
                 <hr />
-                <a href="register.html" className="btn btn-lg btn-info mr-2">
+                <Link to="/register" className="btn btn-lg btn-info mr-2">
                   Sign Up
-                </a>
-                <a href="login.html" className="btn btn-lg btn-light">
+                </Link>
+                <Link to="/login" className="btn btn-lg btn-light">
                   Login
-                </a>
+                </Link>
               </div>
             </div>
           </div>
